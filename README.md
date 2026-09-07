@@ -27,8 +27,13 @@
 
 ### 环境要求
 
-- Node.js ≥ 18（建议 20 LTS）
+- Node.js ≥ 18（强烈建议 20 LTS，与 Electron 33 内置 Node v20 一致）
 - npm ≥ 9
+
+> ⚠️ 注意：不要用 Node 22+（如 Node 24）执行 `npm install` / `npm rebuild`，
+> 否则 `better-sqlite3` 会被编译成系统 Node 的 ABI，开 `npm start` 时报
+> `was compiled against a different Node.js version` 而无法启动。
+> 若已踩坑，执行 `npx electron-rebuild -f -w better-sqlite3` 针对 Electron 重编即可恢复。
 - Python ≥ 3.9（仅「代码运行 / 导出 Word」功能需要）
 - LaTeX 发行版（二选一）：
   - 自动检测本机已安装的 TeX Live / MiKTeX / TinyTeX，或
