@@ -4,6 +4,8 @@
 
 离线可用、开箱即写：写作（LaTeX 编译 + 预览 + 导出 Word）、代码（Python 运行 + 文件编辑）、绘图（流程图建模 + PNG/SVG 导出），并支持局域网多人协作与可插拔扩展系统。
 
+![软件截图](docs/screenshot.png)
+
 - 版本：`1.0.0`
 - 技术栈：`Electron 33` + 原生前端（无框架）+ `better-sqlite3` + `ws`
 - 许可证：`MIT`（见 [LICENSE](./LICENSE)）
