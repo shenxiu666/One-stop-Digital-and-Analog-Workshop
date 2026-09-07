@@ -2,3 +2,4 @@ dist/
 .codegraph/
 AGENTS.md
 node_modules/
+__pycache__/
