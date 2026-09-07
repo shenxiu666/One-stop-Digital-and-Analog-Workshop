@@ -122,6 +122,19 @@ pip install -r assets/python-requirements-base.txt
 ## 常见问题
 
 - **启动白屏 / 报错原生组件不匹配**：多为杀软隔离或安装损坏导致 `better-sqlite3` 加载失败，重装即可；也可在「设置」中重新检查环境。
+- **`npm start` 报 `was compiled against a different Node.js version`**：
+  - 现象：启动失败，日志（`%TEMP%\gongfang-startup.log`）中出现
+    `better_sqlite3.node was compiled against ... NODE_MODULE_VERSION 137 ...
+    requires NODE_MODULE_VERSION 130`。
+  - 原因：`better-sqlite3` 是原生模块，编译时绑定的 Node ABI 必须与
+    Electron 内置 Node 一致（Electron 33 内置 Node v20，要求 ABI 130）。
+    若用本机高版本 Node（如 Node 24，ABI 137）执行了 `npm install` /
+    `npm rebuild`，就会把它编成错误的 ABI，Electron 加载时直接拒绝。
+  - 解决：针对 Electron 重编该模块即可，无需重装依赖：
+    ```bash
+    npx electron-rebuild -f -w better-sqlite3
+    ```
+    然后重新 `npm start`。预防办法见上文「环境要求」：开发机 Node 建议用 20 LTS。
 - **找不到 LaTeX**：先确认本机 TeX 可用，或在设置中手动指定集成环境目录。
 - **协作连不上**：确保同一局域网 / 同一 Wi-Fi，且防火墙放行应用；主机可在协作面板查看成员与共享文件。
 
