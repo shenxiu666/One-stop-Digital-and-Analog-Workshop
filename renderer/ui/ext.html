@@ -1,0 +1,17 @@
+    <div id="extPanel" class="panel flex-1 min-h-0 flex flex-col overflow-hidden">
+      <div class="ext-panel-inner">
+        <div class="ext-panel-title">扩展中心</div>
+        <div class="ext-panel-sub">选择插件添加到工坊，拖拽可调整顺序</div>
+        <div class="ext-search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input id="extSearch" type="text" placeholder="搜索扩展模块，如：专利 / 报告 / 图表..." oninput="Gongfang._extSearch(this.value)">
+        </div>
+        <!-- ★ 工坊预览条（= 工坊工具栏模拟：.write-topbar-modes 样式，写作固定 + 已启用扩展按钮，可拖拽排序） -->
+        <div class="ext-preview-bar" id="extPreviewBar">
+          <div class="ext-preview-items write-topbar-modes" id="extPreviewItems">
+            <!-- v2.6 动态渲染：_renderPreviewBar 填充，去硬编码 -->
+          </div>
+        </div>
+        <div id="extList" class="ext-grid"></div>
+      </div>
+    </div>

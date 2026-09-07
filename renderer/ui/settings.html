@@ -1,0 +1,116 @@
+    <div id="settingsPanel" class="panel flex-1 min-h-0 flex flex-col overflow-hidden" style="padding:12px 16px 16px">
+      <div class="flex gap-0 flex-1 min-h-0" style="position:relative;background:#fff;border-radius:14px;border:1px solid #e7e3dc;box-shadow:0 1px 3px rgba(0,0,0,0.05),0 4px 16px rgba(0,0,0,0.04);overflow:hidden">
+        <div class="set-nav-col">
+          <div class="set-nav-group"><span class="set-nav-group-line"></span>系统设置</div>
+          <div class="set-nav-item" data-section="theme" onclick="Gongfang._navToSection(this,'theme');setTimeout(function(){Gongfang._renderThemeConfig()},100)">
+            <svg class="set-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>
+            <span>主题配置</span>
+          </div>
+          <div class="set-nav-item active" data-section="env" onclick="Gongfang._navToSection(this,'env');setTimeout(function(){Gongfang._renderEnvConfig()},100)">
+            <svg class="set-nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            <span>环境配置</span>
+          </div>
+          <div class="flex-1"></div>
+          <div class="set-nav-about">
+            <img src="../assets/icons/icon.ico" width="50" height="50" class="set-nav-logo" alt="一站式数模工坊">
+            <div class="set-nav-about-text">
+              <p class="set-nav-app-name">一站式数模工坊</p>
+              <p class="set-nav-app-ver"></p>
+            </div>
+          </div>
+        </div>
+        <div id="settingsContent" class="set-content-col">
+          <!-- 主题配置 -->
+          <div class="set-section-panel" data-section="theme">
+            <h3 class="set-panel-title">主题配置</h3>
+            <p class="set-panel-desc">选择软件的主题风格，点击立即生效并自动保存，下次启动保持。</p>
+            <div id="themeList" class="theme-grid"></div>
+          </div>
+
+            <!-- 环境配置：集成环境 + LaTeX + Python 三张卡片 + AI 改错配置 -->
+          <div class="set-section-panel active" data-section="env">
+            <h3 class="set-panel-title">环境配置</h3>
+
+            <!-- 集成环境 → 大标题栏可展开/收起（默认收起） -->
+            <div class="env-card collapsed">
+              <div class="env-card-head" onclick="Gongfang._envToggleCard(this)">
+                <span class="env-card-icon env-icon-appenv"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+                <div class="env-card-title">
+                  <div class="env-card-name">集成环境</div>
+                  <div class="env-card-sub" id="envIntegCardStatus">检测中...</div>
+                </div>
+                <span class="env-card-chevron"></span>
+              </div>
+              <div class="env-card-body">
+                <!-- 对接状态 -->
+                <div class="env-sub-box">
+                  <div class="env-sub-title">对接状态</div>
+                  <div id="envIntegInfo" style="font-size:12px;color:#71717a;line-height:1.9">检测中...</div>
+                </div>
+                <!-- 指定目录（可选）：环境放任意位置时手动指定一次 -->
+                <div class="env-sub-box">
+                  <div class="env-sub-title">指定目录（可选）</div>
+                  <div style="font-size:12px;color:#71717a;line-height:1.8">软件会自动检测常见位置（软件同级/上级、各盘根、桌面/文档/下载）的集成环境；若环境放在其他位置，可在这里浏览选择一次，之后每次启动都会优先使用。</div>
+                  <div style="display:flex;gap:8px;margin-top:8px">
+                    <input id="integAppEnvPath" type="text" class="set-input" readonly placeholder="未指定（使用自动检测）" style="flex:1">
+                    <button class="set-btn" onclick="Gongfang._integBrowseAppEnv()">浏览选择</button>
+                    <button class="set-btn" onclick="Gongfang._integClearAppEnv()">清除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 写作环境（LaTeX）→ 大标题栏可展开/收起（默认收起） -->
+            <div class="env-card collapsed">
+              <div class="env-card-head" onclick="Gongfang._envToggleCard(this)">
+                <span class="env-card-icon env-icon-latex"><img src="../assets/icons/latex.svg" width="28" height="28" alt="LaTeX"></span>
+                <div class="env-card-title">
+                  <div class="env-card-name">写作环境 · LaTeX</div>
+                  <div class="env-card-sub" id="envLatexCardStatus">检测中...</div>
+                </div>
+                <span class="env-card-chevron"></span>
+              </div>
+              <div class="env-card-body">
+                <!-- 容器1：环境引擎（系统路径检测 + 手动指定） -->
+                <div class="env-sub-box">
+                  <div class="env-sub-title">系统路径（可选）</div>
+                  <div style="font-size:12px;color:#71717a;line-height:1.7;margin-bottom:8px">仅当不使用上方「集成环境」、想调用电脑里已安装的系统 LaTeX 时才需配置；留空将自动使用集成环境。</div>
+                  <div class="env-mode-row">
+                    <input id="envLatexPath" type="text" class="set-input" placeholder="粘贴系统 LaTeX / xelatex 路径" oninput="Gongfang._autoSaveSettings()" style="flex:1">
+                    <button class="set-btn set-btn-primary" onclick="Gongfang._envLatexScan()">检测</button>
+                  </div>
+                  <div id="envLatexEnvList" class="env-env-list" style="display:none"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 求解环境（Python）→ 大标题栏可展开/收起（默认收起） -->
+            <div class="env-card collapsed">
+              <div class="env-card-head" onclick="Gongfang._envToggleCard(this)">
+                <span class="env-card-icon env-icon-python"><svg width="28" height="28" viewBox="0 0 24 24" fill="#3776AB"><path d="M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z"/></svg></span>
+                <div class="env-card-title">
+                  <div class="env-card-name">求解环境 · Python</div>
+                  <div class="env-card-sub" id="envPythonCardStatus">检测中...</div>
+                </div>
+                <span class="env-card-chevron"></span>
+              </div>
+              <div class="env-card-body">
+                <!-- 容器1：环境引擎（系统路径检测 + 手动指定） -->
+                <div class="env-sub-box">
+                  <div class="env-sub-title">系统路径（可选）</div>
+                  <div style="font-size:12px;color:#71717a;line-height:1.7;margin-bottom:8px">仅当不使用上方「集成环境」、想调用电脑里已安装的系统 Python 时才需配置；留空将自动使用集成环境。</div>
+                  <div class="env-mode-row">
+                    <input id="envPythonPath" type="text" class="set-input" placeholder="粘贴系统 python.exe 路径" oninput="Gongfang._autoSaveSettings()" style="flex:1">
+                    <button class="set-btn set-btn-primary" onclick="Gongfang._envPythonScan()">检测</button>
+                  </div>
+                  <div id="envPythonEnvList" class="env-env-list" style="display:none"></div>
+                </div>
+              </div>
+          </div>
+
+          <!-- ★ 已删除账号/用量/应用相关面板：对应功能已下线 -->
+
+        </div>
+
+      </div>
+    </div>

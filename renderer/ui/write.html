@@ -1,0 +1,348 @@
+    <div id="writePanel" class="panel flex-1 min-h-0 flex flex-col overflow-hidden" style="position:relative;padding:8px;gap:0">
+      <!-- ★ 最上方长条：左=侧栏开关 / 中=写作·绘图·代码 / 右=预览开关 -->
+      <div class="write-topbar">
+        <div class="write-topbar-side">
+          <button class="write-panel-toggle" id="writeSidebarToggle" onclick="Gongfang._writeToggleSidebar()" title="显示 / 隐藏 文件与大纲栏">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          </button>
+        </div>
+        <div class="write-topbar-modes" id="writeTopbarModes">
+          <!-- ★ 宿主默认按钮：写作（draw/code 等扩展按钮由 toolbar._injectPluginBtn 动态注入） -->
+          <button class="write-mode-btn active" data-mode="write" onclick="Gongfang._writeSwitchMode('write')" title="写作（LaTeX 编辑器）">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            写作
+          </button>
+        </div>
+        <div class="write-topbar-side write-topbar-side-right">
+          <button class="write-panel-toggle" id="writeBtnPreviewToggle" onclick="Gongfang._writeTogglePreview()" title="显示 / 隐藏预览" style="color:#52525b">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 主体（左侧栏 + 编辑器 + PDF 预览）-->
+      <div class="write-main" id="writeMain">
+        <!-- ★ 左列侧栏：上文件浏览器 + 下大纲 -->
+        <div class="write-sidebar" id="writeSidebar">
+          <div class="write-sidebar-section write-files-section" id="writeFilesSection">
+            <div class="write-sidebar-header">
+              <span class="write-sidebar-title" id="writeFilesTitle">文件</span>
+              <select id="writePaperVerSel" title="论文版本（与执行区同步）" style="display:none;max-width:130px;height:22px;font-size:11px;color:#3f3f46;border:1px solid #e4e4e7;border-radius:6px;background:#fff;padding:0 4px;"></select>
+              <button class="write-newtask-btn" id="writeNewTaskBtn" onclick="Gongfang._writeToggleProjectMenu()" title="选择工作目录">＋ 新建</button>
+            </div>
+            <div class="write-files-tree" id="writeFilesTree">
+              <div class="write-sidebar-empty">未选择工作目录，点右上「＋ 新建」选择</div>
+            </div>
+          </div>
+          <!-- ★ 文件 / 大纲 上下拖拽分隔条（带最小高度，不会拖塌成只剩标题框） -->
+          <div class="write-resizer write-resizer-h" id="wsDividerFilesOutline" title="上下拖动调整 文件 / 大纲 高度"></div>
+          <div class="write-sidebar-section write-outline-section">
+            <div class="write-sidebar-header">
+              <span class="write-sidebar-title">大纲</span>
+            </div>
+            <div class="write-outline-tree" id="writeOutlineTree">
+              <div class="write-sidebar-empty">打开任务后显示章节结构</div>
+            </div>
+          </div>
+        </div>
+        <!-- ★ 侧栏 / 编辑器 左右拖拽分隔条 -->
+        <div class="write-resizer write-resizer-v" id="wsDividerSidebar" title="左右拖动调整侧栏宽度"></div>
+        <!-- 编辑器列 -->
+        <div class="write-editor-col" id="writeEditorCol">
+          <!-- 编辑器卡片 -->
+          <div class="write-editor-card no-task rounded-xl border border-zinc-200 bg-white flex flex-col overflow-visible" id="writeEditorCard">
+            <!-- ★ 顶部任务卡片：任务名 + 文件标签页（默认隐藏，有任务时显示） -->
+            <div class="write-editor-taskbar" id="writeEditorTaskbar" style="display:none">
+              <span class="write-header-taskname" id="writeHeaderTaskName"></span>
+              <div class="write-tabbar" id="writeTabs"></div>
+            </div>
+            <div class="write-editor-pane" id="writeEditorPane" style="position:relative">
+              <!-- ★ 成员胶囊条：悬浮在编辑区右下角（透明，文字可从其下方穿过） -->
+              <div id="collabCapsules" style="display:none"></div>
+              <textarea id="writeCodeMirror" style="display:none"></textarea>
+              <div class="write-editor-placeholder" id="writeEditorPlaceholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="1"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <p>从上方菜单选择项目并打开 .tex 文件</p>
+              </div>
+            </div>
+            <!-- ★ 底部 LaTeX 快捷工具栏（撤销/重做 + 各类插入按钮） -->
+            <div class="write-latex-toolbar" id="writeLatexToolbar">
+              <div class="write-latex-toolbar-scroll" id="writeLatexToolbarScroll">
+              <!-- ★ 单人/协作 模式开关（写作面板） -->
+              <div class="write-mode-switch" id="writeCollabSwitch">
+                <button class="write-mode-switch-btn active" data-mode="solo" onclick="Gongfang._collabSwitch('solo')" title="单人模式：单独编辑本机项目">单人</button>
+                <button class="write-mode-switch-btn" data-mode="collab" onclick="Gongfang._collabSwitch('collab')" title="协作模式：多人编辑同一项目">协作</button>
+              </div>
+              <!-- ★ 上一步 / 下一步：撤销/重做（放在最前面） -->
+              <button onclick="Gongfang._writeUndo()" id="writeUndoBtn" title="上一步（撤销）">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              </button>
+              <button onclick="Gongfang._writeRedo()" id="writeRedoBtn" title="下一步（重做）">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              </button>
+              <span class="write-latex-toolbar-sep"></span>
+              <button onclick="Gongfang._writeInsertLatex('bold')" title="加粗"><b>B</b></button>
+              <!-- ★ 换页：插入 \newpage -->
+              <button onclick="Gongfang._writeInsertLatex('newpage')" title="换页">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="4" y1="12" x2="20" y2="12" stroke-dasharray="2 2"/></svg>
+              </button>
+              <span class="write-latex-toolbar-sep"></span>
+              <button onclick="Gongfang._writeInsertLatex('center')" title="居中">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+              </button>
+              <button onclick="Gongfang._writeInsertLatex('multicols')" title="双栏">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18"/><path d="M3 8h6M3 12h6M3 16h6"/><path d="M15 8h6M15 12h6M15 16h6"/></svg>
+              </button>
+              <!-- 引用：表格 / 图表 / 文献 / 代码 -->
+              <div class="write-tb-dropdown" id="refDropdown">
+                <button onclick="Gongfang._writeToggleDropdown('ref')" class="write-tb-dropdown-btn" title="引用">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391C14.017 8.258 16.312 5 20 5v3c-1.98 0-3.087 1.087-3.087 2.9H20v10.1h-5.983zM3 21v-7.391C3 8.258 5.295 5 9 5v3c-1.98 0-3.087 1.087-3.087 2.9H9v10.1H3z"/></svg>
+                </button>
+                <div class="write-tb-dropdown-menu" data-dropdown="ref">
+                  <button onclick="Gongfang._writeInsertRef('tab');Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg> 表格引用</button>
+                  <button onclick="Gongfang._writeInsertRef('fig');Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> 图片引用</button>
+                  <button onclick="Gongfang._writeInsertRef('cite');Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> 文献引用</button>
+                  <button onclick="Gongfang._writeInsertCodeRef();Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> 代码引用</button>
+                </div>
+              </div>
+              <span class="write-latex-toolbar-sep"></span>
+              <!-- 表格：打开完整配置弹窗 -->
+              <button class="write-tb-dropdown-btn" onclick="Gongfang._writeOpenTableDialog()" title="插入表格">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="1"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
+              </button>
+              <!-- 图片：任务 / 本地 / 共享区 -->
+              <div class="write-tb-dropdown" id="imageDropdown">
+                <button onclick="Gongfang._writeToggleImageMenu()" class="write-tb-dropdown-btn" title="插入图片">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                </button>
+                <div class="write-tb-dropdown-menu" data-dropdown="image" style="min-width:96px;">
+                  <button onclick="Gongfang._writeInsertImageWs();Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path d="M9 13.5l2 2 4-4"/><path d="M12 15.5V10"/></svg> 从任务</button>
+                  <button onclick="Gongfang._writeInsertImage();Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> 从本地</button>
+                  <button onclick="Gongfang._writeInsertImageShare();Gongfang._writeCloseDropdowns()"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> 共享区</button>
+                </div>
+              </div>
+              <span class="write-latex-toolbar-sep"></span>
+              <div class="write-tb-dropdown">
+                <button onclick="Gongfang._writeToggleDropdown('format')" class="write-tb-dropdown-btn">格式 <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <div class="write-tb-dropdown-menu" data-dropdown="format">
+                  <div class="write-tb-dropdown-group">结构</div>
+                  <button onclick="Gongfang._writeInsertLatex('section');Gongfang._writeCloseDropdowns()">一级标题</button>
+                  <button onclick="Gongfang._writeInsertLatex('subsection');Gongfang._writeCloseDropdowns()">二级标题</button>
+                  <button onclick="Gongfang._writeInsertLatex('subsubsection');Gongfang._writeCloseDropdowns()">三级标题</button>
+                  <div class="write-tb-dropdown-group">列表</div>
+                  <button onclick="Gongfang._writeInsertLatex('enumerate');Gongfang._writeCloseDropdowns()">① 有序列表</button>
+                  <button onclick="Gongfang._writeInsertLatex('itemize');Gongfang._writeCloseDropdowns()">• 无序列表</button>
+                  <div class="write-tb-dropdown-group">公式</div>
+                  <button onclick="Gongfang._writeInsertLatex('math-inline');Gongfang._writeCloseDropdowns()">𝑓 行内公式</button>
+                  <button onclick="Gongfang._writeInsertLatex('equation');Gongfang._writeCloseDropdowns()">𝑓 行间公式（带编号）</button>
+                </div>
+              </div>
+              </div>
+              <!-- ★ 固定右侧：保存 / 终止 / 编译（窗口拖动时位置不动，只遮蔽前面工具按钮） -->
+              <div class="write-latex-toolbar-actions">
+                <!-- ★ 协作菜单（仅协作模式开启时显示）：按钮 + 状态气泡 + 下拉菜单 -->
+                <div class="write-tb-dropdown collab-tb-dropdown" id="writeCollabMenuWrap" style="display:none">
+                  <span class="collab-status-bubble" id="writeCollabStatusBubble">编辑模式</span>
+                  <button class="write-tb-dropdown-btn write-btn-collab" id="writeCollabMenuBtn" onclick="Gongfang._writeToggleDropdown('collab')" title="协作菜单">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span>协作</span>
+                  </button>
+                  <div class="write-tb-dropdown-menu collab-dropdown-menu" data-dropdown="collab">
+                    <!-- 1. 拖放区：拖入图片或点击选择，上传到图片共享文件区 -->
+                    <div class="collab-drop-zone" id="collabDropZone" onclick="Gongfang._collabUploadShared()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      <span>拖拽图片到此处，点击选择上传</span>
+                    </div>
+                    <!-- 2. 图片共享文件区列表（约 4~5 行，上下滚动） -->
+                    <div class="write-tb-dropdown-group">图片共享文件区</div>
+                    <div class="collab-dropdown-files" id="writeCollabDropdownFiles"><div class="collab-dropdown-empty">暂无共享图片</div></div>
+                    <!-- 3. 我的信息：延迟 / 当前名字 / 协作码 -->
+                    <div class="write-tb-dropdown-group">我的信息</div>
+                    <div class="collab-dropdown-info" id="writeCollabDropdownInfo"></div>
+                  </div>
+                </div>
+                <span class="write-latex-toolbar-sep" id="writeCollabSep" style="display:none"></span>
+                <button class="write-btn-save" onclick="Gongfang._writeSaveFile()" title="保存">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                </button>
+                <button class="write-btn-stop" id="writeBtnStop" onclick="Gongfang._writeStopCompile()" title="终止编译" disabled>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+                </button>
+                <button class="write-btn-compile" id="writeBtnCompile" onclick="Gongfang._writeCompile()" title="编译 Ctrl+B">
+                  <svg class="write-compile-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  <svg class="write-compile-spinner" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        <!-- 编译日志卡片（整宽底部面板，与上方主区域此消彼长） -->
+      <div class="write-compile-card rounded-xl border border-zinc-200 bg-white flex flex-col overflow-hidden" id="writeCompileBar">
+        <!-- ★ 可展开区域：标题栏 + 日志主体，作为一个整体动画向上展开 -->
+        <div class="write-compile-expand" id="writeCompileExpand">
+          <div class="write-compile-titlebar">
+            <div class="write-compile-titlebar-left">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              <span class="write-compile-titlebar-title">编译输出</span>
+              <span class="write-compile-titlebar-time" id="writeCompileBarTime"></span>
+            </div>
+            <div class="write-compile-titlebar-right">
+            </div>
+          </div>
+          <div class="write-compile-bar-body" id="writeCompileBarBody">
+            <pre class="write-compile-bar-log" id="writeCompileBarLog"></pre>
+          </div>
+        </div>
+        <div class="view-card-header" id="writeCompileBarHeader" onclick="Gongfang._writeToggleCompileLog()" style="cursor:pointer">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <!-- ★ 设置按钮：放在编译输出栏最左侧 -->
+            <button class="write-menu-btn" id="writeSettingsBtn" onclick="event.stopPropagation();Gongfang._writeToggleCompileSettings()" title="设置：编译主域 / 编译引擎 / 代码主题 / 协作模式">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <span class="view-card-header-text">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+              编译输出
+            </span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="write-compile-bar-status" id="writeCompileBarStatus"><span class="cmp-dot"></span>就绪</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="writeCompileBarToggle" style="transform:rotate(180deg)"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+      </div>
+
+      </div>
+        <!-- ★ 编辑器 / 预览 左右拖拽分隔条 -->
+        <div class="write-resizer write-resizer-v write-preview-resizer" id="wsDividerPreview" title="左右拖动调整预览宽度"></div>
+        <!-- 右列：PDF 预览卡片 -->
+        <div class="write-preview-col" id="writePreviewCol">
+          <div class="write-preview-card rounded-xl border border-zinc-200 bg-white flex flex-col overflow-hidden">
+            <div class="view-card-header" style="padding:4px 10px;justify-content:flex-end;">
+              <div style="display:flex;align-items:center;gap:4px;">
+                <button onclick="Gongfang._writeExportWord()" title="导出 Word" style="display:flex;align-items:center;justify-content:center;gap:5px;padding:0 9px;height:22px;border:1px solid var(--color-zinc-200);border-radius:5px;background:var(--color-white);color:#2B579A;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;overflow:hidden;"><svg width="15" height="15" viewBox="0 0 24 24"><rect x="1.5" y="2.5" width="21" height="19" rx="3.5" fill="#2B579A"/><text x="12" y="18" font-family="Segoe UI,Arial,sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">W</text></svg><span>Word</span></button>
+                <button onclick="Gongfang._writePdfRefresh()" title="刷新" style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--color-zinc-200);border-radius:5px;background:var(--color-white);color:var(--color-zinc-600);cursor:pointer;transition:all .12s;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+                <button onclick="Gongfang._writePdfFullscreen()" id="writePdfFullscreenBtn" title="全屏展示 PDF" style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--color-zinc-200);border-radius:5px;background:var(--color-white);color:var(--color-zinc-600);cursor:pointer;transition:all .12s;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>
+                <button onclick="Gongfang._writePdfDownload()" title="下载" style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:1px solid var(--color-zinc-200);border-radius:5px;background:var(--color-white);color:var(--color-zinc-600);cursor:pointer;transition:all .12s;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+              </div>
+            </div>
+            <div class="write-preview-pane" id="writePreviewPane">
+              <div class="write-preview-placeholder" id="writePreviewPlaceholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d4d4d8" stroke-width="1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                <p>编译后 PDF 将在此显示</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ★ 扩展模式容器宿主：各扩展（draw/code/...）activate 时自建 id=writeMode_<extId> 的容器插入此处 -->
+      <div id="writeExtHost" style="display:none;flex:1;min-height:0;flex-direction:column;gap:6px;overflow:hidden"></div>
+
+      <!-- 下拉菜单：项目列表 -->
+      <div class="write-dropdown" id="writeProjectMenu" style="display:none">
+        <div class="write-dropdown-list" id="writeProjectMenuList"></div>
+      </div>
+
+      <!-- 下拉菜单：章节大纲 -->
+      <div class="write-dropdown" id="writeOutlineMenu" style="display:none;min-width:230px;max-width:360px;max-height:70vh;overflow-y:auto">
+        <div class="write-dropdown-list" id="writeOutlineMenuTree"></div>
+      </div>
+
+      <!-- 设置：左侧窄菜单 + 右侧宽内容（点击左侧切换） -->
+      <div class="write-dropdown write-settings-menu" id="writeCompileSettingsMenu" style="display:none">
+        <div class="write-settings-nav">
+          <div class="write-settings-nav-item active" data-pane="main" onclick="Gongfang._collabSettingsNav(this,'main')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>
+            <span>编译主域</span>
+          </div>
+          <div class="write-settings-nav-item" data-pane="engine" onclick="Gongfang._collabSettingsNav(this,'engine')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+            <span>编译引擎</span>
+          </div>
+          <div class="write-settings-nav-item" data-pane="theme" onclick="Gongfang._collabSettingsNav(this,'theme')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>代码主题</span>
+          </div>
+          <div class="write-settings-nav-item" data-pane="collab" onclick="Gongfang._collabSettingsNav(this,'collab')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>协作模式</span>
+          </div>
+        </div>
+        <div class="write-settings-detail-view">
+          <div class="ws-detail-section active" data-pane="main">
+            <div class="ws-detail-head">编译主域</div>
+            <div class="ws-detail-scroll">
+              <div class="write-dropdown-list" id="writeSettingsMainList"></div>
+            </div>
+          </div>
+          <div class="ws-detail-section" data-pane="engine">
+            <div class="ws-detail-head">编译引擎</div>
+            <div class="ws-detail-scroll">
+              <div class="write-dropdown-list" id="writeSettingsEngineList"></div>
+            </div>
+          </div>
+          <div class="ws-detail-section" data-pane="theme">
+            <div class="ws-detail-head">代码主题</div>
+            <div class="ws-detail-scroll">
+              <div class="write-dropdown-list" id="writeSettingsCodeFrameList"></div>
+            </div>
+          </div>
+          <div class="ws-detail-section" data-pane="collab">
+            <div class="ws-detail-head">协作模式</div>
+            <div class="ws-detail-scroll" id="writeSettingsCollabPane"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ 协作房间弹窗（创建 / 加入 / 成员列表 / 确认进入） ═══ -->
+    <div class="collab-modal-overlay" id="collabRoomDialog">
+      <div class="collab-modal">
+        <h3>协作房间</h3>
+        <div class="collab-tabs">
+          <div class="collab-tab active" id="roomTabCreate" onclick="Gongfang._collabRoomTab('create')">创建房间</div>
+          <div class="collab-tab" id="roomTabJoin" onclick="Gongfang._collabRoomTab('join')">加入房间</div>
+        </div>
+        <div id="roomCreateView">
+          <div class="collab-code-big" id="roomCreateCode">······</div>
+          <div style="text-align:center;font-size:11px;color:#a1a1aa;margin-top:2px">协作码 · <span style="cursor:pointer;color:#4f46e5" onclick="Gongfang._collabRegen()">换一个</span></div>
+        </div>
+        <div id="roomJoinView" style="display:none">
+          <!-- ★ 两种加入方式：① 自动扫描 → 点击主机直接进入；② 输入 6 位协作码自动匹配进入 -->
+          <div class="collab-host-list" id="roomHostList"><div class="collab-host-row" style="color:#a1a1aa">（正在扫描局域网主机…）</div></div>
+          <input class="collab-code-input" id="roomJoinInput" maxlength="6" placeholder="或输入 6 位协作码自动加入" oninput="Gongfang._collabJoinInput(this)">
+        </div>
+        <div class="collab-actions">
+          <button class="collab-btn" onclick="Gongfang._collabCloseRoom()">取消</button>
+          <button class="collab-btn primary" onclick="Gongfang._collabConfirm()">进入</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 编译投票弹窗（全员同意才编译；头像实时显示谁已同意/拒绝） ═══ -->
+    <div class="collab-modal-overlay" id="collabVoteDialog">
+      <div class="collab-modal" style="width:420px">
+        <h3 id="voteTitle">请求编译整个 LaTeX 项目</h3>
+        <div style="font-size:12px;color:#71717a" id="voteSub">正在请求所有在线成员同意…</div>
+        <div class="collab-vote-members" id="voteMembers"></div>
+        <div class="collab-countdown"><i id="voteBar" style="width:100%"></i></div>
+        <div class="collab-actions" id="voteActions">
+          <button class="collab-btn danger" id="voteRejectBtn" onclick="Gongfang._collabVote(false)">拒绝</button>
+          <button class="collab-btn primary" id="voteAgreeBtn" onclick="Gongfang._collabVote(true)">同意</button>
+          <button class="collab-btn danger" id="voteCancelBtn" onclick="Gongfang._collabCancelCompile()" style="display:none">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toastBox"></div>
+
+    <!-- ═══ 协同编译提示窗（右上角浮动小卡片，不再全屏遮罩；可终止编译） ═══ -->
+    <div id="collabCompileMask" style="display:none">
+      <div class="collab-compile-box">
+        <button class="collab-compile-close" onclick="Gongfang._collabAbortCompile()" title="终止编译">×</button>
+        <div class="collab-compile-spinner"></div>
+        <div class="collab-compile-text">论文正在协同编译中…</div>
+        <button class="collab-btn danger" onclick="Gongfang._collabAbortCompile()">终止编译</button>
+      </div>
+    </div>
+

@@ -1,0 +1,16 @@
+{
+  "id": "write",
+  "name": "写作",
+  "version": "1.0.0",
+  "author": "一站式数模工坊",
+  "description": "LaTeX 写作编辑器，含文件树、编译、协作集成；同时承载工坊顶栏切换宿主逻辑",
+  "main": "main.js",
+  "type": "builtin",
+  "permissions": ["fs", "ai", "codemirror", "workspace", "state"],
+  "slot": "workshop",
+  "host": true,
+  "button": {
+    "label": "写作",
+    "order": 1
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "yizhanshi-gongfang",
+  "version": "1.0.0",
+  "description": "一站式数模工坊 — 本地 LaTeX 写作 / Python 代码 / 流程图绘图工作台",
+  "author": "一站式数模工坊",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder --win nsis"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.11.1",
+    "ws": "^8.21.3",
+    "xlsx": "^0.18.5",
+    "yauzl": "^2.10.0"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "electron@33.4.11": true
+  },
+  "build": {
+    "appId": "com.yizhanshi.gongfang",
+    "productName": "一站式数模工坊",
+    "asar": true,
+    "npmRebuild": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "extensions/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "extraResources": [
+      {
+        "from": "extensions/builtin",
+        "to": "extensions/builtin"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "一站式数模工坊"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
+}

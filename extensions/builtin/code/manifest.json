@@ -1,0 +1,16 @@
+{
+  "id": "code",
+  "name": "代码",
+  "version": "1.0.0",
+  "author": "一站式数模工坊",
+  "description": "代码工作台，支持 Python 运行、文件编辑、终端输出",
+  "main": "main.js",
+  "type": "builtin",
+  "permissions": ["fs", "workspace", "codemirror"],
+  "slot": "workshop",
+  "button": {
+    "label": "代码",
+    "order": 3,
+    "icon": "<polyline points=\"16 18 22 12 16 6\"/><polyline points=\"8 6 2 12 8 18\"/>"
+  }
+}

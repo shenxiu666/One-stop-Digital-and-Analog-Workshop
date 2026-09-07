@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full overflow-hidden">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一站式数模工坊</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/collab.css">
+  <!-- KaTeX 数学公式渲染（本地化） -->
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/auto-render.min.js"></script>
+  <!-- CodeMirror / AntV X6 懒加载，由 shared/dom.js 按需注入 -->
+</head>
+<body class="h-full overflow-hidden font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','Helvetica_Neue',sans-serif] text-[13px] text-zinc-700 antialiased select-none bg-white">
+<div id="splashScreen" class="splash"><span class="splash-brand" id="splashBrand">一站式数模工坊</span><span class="splash-tag" id="splashTag">本地写作 · 代码 · 绘图工作台</span></div>
+
+<div id="app" class="app-layout">
+
+  <!-- 自定义标题栏（拖拽区域） -->
+  <div class="app-titlebar">
+  </div>
+
+  <!-- 左侧导航栏 -->
+  <nav class="app-nav">
+    <span class="app-nav-brand">工坊</span>
+    <div class="app-nav-middle">
+      <button class="app-nav-btn active" id="btnWrite" onclick="Gongfang._navTo(this)" title="工坊">
+        <span class="app-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+        <span class="app-nav-label">工坊</span>
+      </button>
+      <button class="app-nav-btn" id="btnExt" onclick="Gongfang._navTo(this)" title="扩展">
+        <span class="app-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2"/></svg></span>
+        <span class="app-nav-label">扩展</span>
+      </button>
+    </div>
+    <div class="app-nav-bottom">
+      <button class="app-nav-btn" id="btnSettings" onclick="Gongfang._navTo(this)" title="设置">
+        <span class="app-nav-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.67 3.54a2.3 2.3 0 0 1 4.66 0l.18 1.16a2.3 2.3 0 0 0 3.1 1.79l1.08-.44a2.3 2.3 0 0 1 2.33 4.04l-.91.72a2.3 2.3 0 0 0 0 3.58l.91.72a2.3 2.3 0 0 1-2.33 4.04l-1.08-.44a2.3 2.3 0 0 0-3.1 1.79l-.18 1.16a2.3 2.3 0 0 1-4.66 0l-.18-1.16a2.3 2.3 0 0 0-3.1-1.79l-1.08.44a2.3 2.3 0 0 1-2.33-4.04l.91-.72a2.3 2.3 0 0 0 0-3.58l-.91-.72a2.3 2.3 0 0 1 2.33-4.04l1.08.44a2.3 2.3 0 0 0 3.1-1.79l.18-1.16Z"/><circle cx="12" cy="12" r="3.2"/></svg></span>
+        <span class="app-nav-label">设置</span>
+      </button>
+    </div>
+  </nav>
+
+  <main id="panelArea" class="app-main">
+    <!-- ★ 面板 HTML 由 index.js 的 _loadPanelsHTML() 启动时从 ui/ 目录注入 -->
+  </main>
+
+  <!-- ★ 插件详情弹窗（全局） -->
+  <div id="extModal" class="ext-modal-overlay" style="display:none" onclick="if(event.target===this)Gongfang._extModalClose()">
+    <div class="ext-modal-box">
+      <button class="ext-modal-close" onclick="Gongfang._extModalClose()">✕</button>
+      <div class="ext-modal-icon" id="extModalIcon"></div>
+      <div class="ext-modal-name" id="extModalName"></div>
+      <div class="ext-modal-desc" id="extModalDesc"></div>
+      <div class="ext-modal-meta" id="extModalMeta"></div>
+      <div class="ext-modal-actions" id="extModalActions"></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="shared/dom.js"></script>
+<script src="shared/icons.js"></script>
+<script src="shared/file-icons.js"></script>
+<script src="shared/dialog.js"></script>
+<script src="shared/run-detect.js"></script>
+<script src="state.js"></script>
+<script src="storage.js"></script>
+<script src="toolbar.js"></script>
+<!-- ★ write 宿主模块静态加载（不走扩展注入流程，直接内置就绪） -->
+<script src="../extensions/builtin/write/main.js"></script>
+<script src="panels/collab.js"></script>
+<script src="panels/settings.js"></script>
+<script src="ui.js"></script>
+<script src="index.js"></script>
+
+<!-- 图片预览弹窗 -->
+<div id="imgPreviewOverlay" class="img-preview-overlay" style="display:none">
+  <button class="img-preview-close" onclick="Gongfang._closeImgPreview()">×</button>
+  <div class="img-preview-content">
+    <img id="imgPreviewImg" src="" alt="preview">
+  </div>
+  <div class="img-preview-nav">
+    <button id="imgPreviewPrev" onclick="Gongfang._imgPreviewNav(-1)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span id="imgPreviewInfo" class="img-preview-info"></span>
+    <button id="imgPreviewNext" onclick="Gongfang._imgPreviewNav(1)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 18"/></svg>
+    </button>
+  </div>
+</div>
+<div id="tablePreviewOverlay" class="table-preview-overlay" style="display:none">
+  <div class="table-preview-panel">
+    <div class="table-preview-header">
+      <span id="tablePreviewTitle">表格预览</span>
+      <button class="table-preview-close" onclick="Gongfang._closeTablePreview()">×</button>
+    </div>
+    <div id="tablePreviewBody" class="table-preview-body"></div>
+  </div>
+</div>
+</body>
+</html>

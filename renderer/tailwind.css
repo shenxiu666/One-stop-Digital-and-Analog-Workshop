@@ -1,0 +1,365 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   Gongfang v1.4 — 全新设计
+   干净、现代、专业
+   ═══════════════════════════════════════════════ */
+
+/* ── 工具栏按钮 ── */
+.t-btn {
+  @apply inline-flex items-center px-3 h-7 rounded-md text-[13px] font-medium
+         border cursor-pointer transition-all duration-150 whitespace-nowrap;
+}
+/* 禁用态：字变浅灰，背景发灰，边框保留本色 */
+.t-btn:disabled { @apply pointer-events-none text-zinc-300 bg-zinc-50; cursor: not-allowed; }
+
+/* 上传 — 白底黑字 */
+.t-btn.t-upload { @apply bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400; }
+
+/* 运行 idle — 蓝色 */
+.t-btn.t-primary { @apply bg-blue-500 border-blue-500 text-white hover:bg-blue-400 hover:border-blue-400; }
+/* 运行中 → 暂停 — 橙色 */
+.t-btn.t-pause { @apply bg-amber-500 border-amber-500 text-white hover:bg-amber-400 hover:border-amber-400; }
+/* 暂停中 → 继续 — 绿色 */
+.t-btn.t-resume { @apply bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-400 hover:border-emerald-400; }
+
+/* 中止 idle — 红色边框 + 灰字 */
+.t-btn.t-stop-idle { @apply border-red-200 bg-white; }
+/* 中止 running — 红色 */
+.t-btn.t-danger { @apply border-red-200 text-red-500 hover:bg-red-50 hover:border-red-300 hover:text-red-600; }
+.t-btn.t-danger.running { animation: pulse-danger 1.2s ease-in-out infinite; }
+/* 中止 done — 绿色复原 */
+.t-btn.t-reset { @apply bg-emerald-500 border-emerald-500 text-white hover:bg-emerald-400; }
+
+/* 文件 / 设置 — 白底黑字 */
+.t-btn.t-dark { @apply bg-white border-zinc-300 text-zinc-700 hover:bg-zinc-50 hover:border-zinc-400; }
+
+/* ── 状态指示器 ── */
+.status-dot { @apply w-[6px] h-[6px] rounded-full bg-zinc-300 shrink-0; }
+.status-dot.status-ready { @apply bg-emerald-500; }
+.status-dot.status-running { @apply bg-amber-500; animation: pulse-dot 1.2s ease-in-out infinite; }
+.status-dot.status-error { @apply bg-red-500; }
+
+/* ── 面板入场 ── */
+.panel { animation: slide-in 150ms ease-out; }
+
+/* ── 上传按钮（左栏，固定大小，图标上文字下）── */
+.up-btn {
+  @apply flex flex-col items-center justify-center gap-1.5 h-[100px] rounded-xl border
+         cursor-pointer transition-all duration-150 w-full;
+  border: none;
+  font-family: inherit;
+}
+.up-btn svg { @apply w-6 h-6 shrink-0; }
+.up-btn .font-medium { @apply text-[13px]; }
+.up-btn-sub { @apply text-[10px] opacity-50; }
+.up-btn-topic  { @apply bg-blue-50 text-blue-600 hover:bg-blue-100; }
+.up-btn-data   { @apply bg-emerald-50 text-emerald-600 hover:bg-emerald-100; }
+
+/* ── 文件列表区（右栏）── */
+.upload-section-title {
+  @apply flex items-center gap-1.5 px-3 py-1.5 bg-zinc-50 text-[11px] font-semibold text-zinc-500;
+}
+.upload-section-title svg { @apply text-zinc-400 shrink-0; }
+.upload-file {
+  @apply flex items-center gap-2 px-3 py-1.5 hover:bg-zinc-50 transition-colors;
+}
+.upload-file-icon {
+  @apply w-6 h-6 rounded-md flex items-center justify-center shrink-0;
+}
+.upload-file-icon svg { @apply w-3.5 h-3.5; }
+.upload-file-icon.doc  { @apply bg-blue-50 text-blue-500; }
+.upload-file-icon.xls  { @apply bg-emerald-50 text-emerald-500; }
+.upload-file-icon.img  { @apply bg-purple-50 text-purple-500; }
+.upload-file-icon.code { @apply bg-amber-50 text-amber-500; }
+.upload-file-icon.folder { @apply bg-sky-50 text-sky-500; }
+.upload-file-name {
+  @apply flex-1 text-[12px] font-medium text-zinc-700 truncate;
+}
+.upload-file-meta {
+  @apply text-[10px] text-zinc-400;
+}
+.upload-file-del {
+  @apply w-5 h-5 flex items-center justify-center rounded-full text-zinc-300
+         hover:bg-red-50 hover:text-red-400 cursor-pointer transition-colors text-[12px] shrink-0;
+}
+
+/* ── 进度 ── */
+.progress-track {
+  @apply h-1.5 bg-zinc-100 rounded-full overflow-hidden relative;
+}
+.progress-shimmer {
+  @apply absolute inset-0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 40%, rgba(255,255,255,0.6) 60%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+  z-index: 1;
+}
+.progress-fill {
+  @apply h-full bg-zinc-900 rounded-full transition-[width] duration-500 ease-out w-0 relative z-0;
+}
+#progressBarFill.done { @apply bg-emerald-500; }
+
+/* ── 步骤列表 ── */
+.step-item { @apply flex items-center gap-2.5 px-3 py-2 rounded-lg text-[12px] transition-colors; }
+.step-item:hover { @apply bg-zinc-50; }
+.step-item .step-status-icon { @apply w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold shrink-0; }
+.step-item .step-name { @apply flex-1 text-zinc-600; }
+.step-item .step-duration { @apply text-[11px] text-zinc-300 font-mono shrink-0; }
+
+.step-item.status-pending .step-name { @apply text-zinc-300; }
+.step-item.status-pending .step-status-icon { @apply bg-zinc-100 text-zinc-300; }
+
+.step-item.status-completed .step-name { @apply text-emerald-700; }
+.step-item.status-completed .step-status-icon { @apply bg-emerald-100 text-emerald-500; }
+.step-item.status-completed .step-duration { @apply text-emerald-500; }
+
+.step-item.status-active .step-name { @apply text-amber-700 font-semibold; }
+.step-item.status-active .step-status-icon { @apply bg-amber-100 text-amber-500; animation: icon-blink 0.6s ease-in-out infinite; }
+.step-item.status-active { @apply bg-amber-50; animation: active-pulse 1.5s ease-in-out infinite; }
+
+.step-item.status-error .step-name { @apply text-red-600; }
+.step-item.status-error .step-status-icon { @apply bg-red-100 text-red-500; }
+
+.step-phase-header { @apply text-[11px] font-bold text-zinc-400 uppercase tracking-wider px-3 pt-4 pb-1; }
+
+/* ── 文件标签 ── */
+.file-tag { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-zinc-100 text-zinc-600; }
+.file-tag .file-tag-name { @apply max-w-[140px] truncate; }
+.file-tag .file-tag-remove { @apply cursor-pointer text-zinc-300 hover:text-red-400 transition-colors; }
+.file-tag.folder { @apply bg-emerald-50 text-emerald-600; }
+
+/* ── 文件树 ── */
+.tree-node-header { @apply flex items-center gap-1 px-1 py-0.5 rounded cursor-pointer hover:bg-zinc-50 transition-colors; }
+.tree-toggle { @apply w-4 text-[10px] text-zinc-300 text-center font-mono transition-transform; }
+.tree-toggle.expanded { @apply rotate-90; }
+.tree-icon { @apply text-xs text-zinc-400; }
+.tree-name { @apply text-zinc-600; }
+.tree-name.file { @apply cursor-pointer hover:text-blue-600 hover:underline; }
+.tree-children { @apply ml-4; }
+.tree-children.collapsed { @apply hidden; }
+.tree-empty { @apply text-zinc-300 text-center py-8; }
+
+/* ── 设置面板 ── */
+.set-section { @apply mb-5; }
+.set-title { @apply text-[13px] font-semibold text-zinc-800 mb-2; }
+.set-rows { @apply flex flex-col gap-1; }
+.set-fields { @apply flex flex-col gap-1.5; }
+.set-fields label { @apply text-[11px] text-zinc-400 font-medium; }
+.set-input { @apply h-[32px] px-2.5 rounded-lg border border-zinc-200 bg-white text-[13px] text-zinc-700
+                  outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-200 transition-all;
+            font-family: inherit; }
+.set-input::placeholder { @apply text-zinc-300; }
+.set-btn { @apply inline-flex items-center px-3 h-[32px] rounded-lg border border-zinc-200 bg-white
+                text-[12px] text-zinc-500 cursor-pointer hover:bg-zinc-50 hover:text-zinc-700
+                transition-all font-medium; }
+.set-btn-primary { @apply bg-zinc-900 text-white border-zinc-900 hover:bg-zinc-700 hover:text-white; }
+select.set-input { @apply appearance-none cursor-pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center; padding-right: 32px; }
+
+/* ── 开关 ── */
+.toggle-switch {
+  @apply appearance-none w-8 h-5 rounded-full bg-zinc-200 cursor-pointer relative transition-colors duration-200;
+}
+.toggle-switch::after {
+  content: '';
+  @apply absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform duration-200;
+}
+.toggle-switch:checked { @apply bg-blue-500; }
+.toggle-switch:checked::after { transform: translateX(12px); }
+
+/* ── 环境行 ── */
+.env-row { @apply flex items-center justify-between px-3 py-2 rounded-lg bg-zinc-50 text-[12px]; }
+.env-status { @apply font-mono text-[11px]; }
+.env-status.env-pending { @apply text-zinc-300; }
+.env-status.env-ok { @apply text-emerald-600; }
+.env-status.env-fail { @apply text-red-500; }
+
+/* ── 邀请码 ── */
+.invite-dot { @apply w-[7px] h-[7px] rounded-full; }
+.invite-dot.invite-verified { @apply bg-emerald-500; }
+.invite-dot.invite-unverified { @apply bg-red-400; }
+.invite-dot.invite-verifying { @apply bg-amber-500; animation: pulse-dot 0.8s infinite; }
+
+/* ── 滚动条 ── */
+::-webkit-scrollbar { width: 2px; height: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(161,161,170,.45); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(113,113,122,.65); }
+
+/* ── Toast ── */
+.gongfang-toast {
+  @apply fixed top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full
+         bg-zinc-900 text-white text-[13px] font-medium shadow-lg
+         opacity-0 translate-y-[-8px] transition-all duration-300 z-[9999] pointer-events-none;
+}
+.gongfang-toast.show { @apply opacity-100 translate-y-0; }
+
+/* ── 激活遮罩 ── */
+.activation-overlay {
+  @apply fixed inset-0 flex items-center justify-center z-[1000];
+  background: rgba(0,0,0,0.2); backdrop-filter: blur(12px);
+  animation: fade-in 200ms ease-out;
+}
+.activation-card {
+  @apply bg-white rounded-2xl p-8 w-[380px] shadow-2xl shadow-black/5 text-center;
+}
+.activation-title { @apply text-[18px] font-bold text-zinc-800 mb-1; }
+.activation-subtitle { @apply text-[13px] text-zinc-400 mb-6; }
+.activation-input {
+  @apply w-full h-10 px-4 rounded-xl border-2 border-zinc-200 text-[15px] text-center
+         text-zinc-800 outline-none focus:border-zinc-400 transition-colors;
+  font-family: inherit;
+}
+.activation-btn {
+  @apply mt-3 w-full h-10 rounded-xl bg-zinc-900 text-white text-[15px] font-semibold
+         cursor-pointer hover:bg-zinc-700 transition-colors;
+}
+.activation-btn:disabled { @apply opacity-30 cursor-not-allowed; }
+.activation-status { @apply mt-3 text-xs text-zinc-400; }
+.activation-status.error { @apply text-red-500; }
+
+/* ── 错误弹窗 ── */
+.error-overlay {
+  @apply fixed inset-0 flex items-center justify-center z-[10000];
+  background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
+}
+
+/* ═══════════════════════════════════════════════
+   动画
+   ═══════════════════════════════════════════════ */
+
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.3; transform: scale(0.7); }
+}
+@keyframes pulse-danger {
+  0%, 100% { color: #ef4444; }
+  50%      { color: #fca5a5; }
+}
+@keyframes active-pulse {
+  0%, 100% { background-color: rgba(251, 191, 36, 0.04); }
+  50%      { background-color: rgba(251, 191, 36, 0.12); }
+}
+@keyframes icon-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ── 公告刷新按钮 ── */
+.wh-notice-refresh {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a1a1aa;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  transition: all .15s;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.wh-notice-refresh:hover {
+  color: #18181b;
+  background: #f4f4f5;
+}
+.wh-notice-refresh.spinning svg {
+  animation: spin-360 0.6s linear;
+}
+@keyframes spin-360 {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── 上传页面布局：模板固定5个，文件区自适应 ── */
+.task-file-zone { flex: 1; min-height: 100px; }
+.task-tpl-panel { height: 275px; }
+
+/* ── 代码工作台 / 写作面板：编译/运行按钮转圈 ── */
+.write-btn-compile .write-compile-spinner { display: none; }
+.write-btn-compile.compiling .write-compile-icon { display: none; }
+.write-btn-compile.compiling .write-compile-spinner { display: block; animation: write-btn-spin .8s linear infinite; }
+@keyframes write-btn-spin { to { transform: rotate(360deg); } }
+
+/* 代码工作台按钮尺寸和颜色 */
+.cd-editor-actions .write-btn-save,
+.cd-editor-actions .write-btn-stop,
+.cd-editor-actions .write-btn-compile { width: 24px; height: 24px; }
+.cd-editor-actions .write-btn-save { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; }
+.cd-editor-actions .write-btn-save:hover { background: #dbeafe; }
+.cd-editor-actions .write-btn-stop { color: #dc2626; background: #fef2f2; border-color: #fecaca; }
+.cd-editor-actions .write-btn-stop:hover:not(:disabled) { background: #fee2e2; }
+.cd-editor-actions .write-btn-compile { color: #16a34a; background: #f0fdf4; border-color: #bbf7d0; }
+.cd-editor-actions .write-btn-compile:hover { background: #dcfce7; }
+.cd-editor-actions .write-btn-compile.compiling { color: #16a34a; background: #f0fdf4; border-color: #bbf7d0; cursor: wait; }
+.cd-editor-actions .write-btn-stop:disabled { color: #cbd5e1; background: #f1f5f9; border-color: #e2e8f0; cursor: not-allowed; }
+
+
+/* ★ 模板说明区：复用主页公告区（.wh-notice-desc / .wn-table）的 Markdown 展示格式 */
+.tpl-preview-body--md { padding:20px 26px 28px; }
+.tpl-preview-body--md .tpl-md {
+  flex:1; min-height:0; overflow:auto;    /* 保留滚动能力，滑条用样式隐藏 */
+  padding:0; margin-top:0;
+  font-size:10px; color:var(--color-zinc-700); line-height:1.45;   /* 与主页公告区字号/行距一致 */
+  user-select:text; scrollbar-width:none; /* Firefox 隐藏滚动条 */
+}
+.tpl-preview-body--md .tpl-md::-webkit-scrollbar { display:none; } /* Chromium 隐藏滚动条 */
+.tpl-preview-body--md .tpl-md .wn-table { font-size:10px; }
+.tpl-reserved {
+  flex:1; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:10px; margin:14px; padding:24px;
+  border:1px dashed var(--color-zinc-200); border-radius:10px;
+  background:var(--color-zinc-50); color:var(--color-zinc-400); user-select:none;
+}
+.tpl-reserved-icon {
+  width:46px; height:46px; display:flex; align-items:center; justify-content:center;
+  border-radius:12px; background:var(--color-white); border:1px solid var(--color-zinc-100);
+  color:var(--color-zinc-300); box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.tpl-reserved-title { font-size:13px; font-weight:600; letter-spacing:.02em; color:var(--color-zinc-500); }
+.tpl-reserved-sub { font-size:11px; color:var(--color-zinc-400); }
+
+
+
+/* ── 运行前环境检测面板：单栏宽屏 + 打字机式日志 ── */
+.modal-box-run { width: 960px !important; max-width: calc(100vw - 64px); }
+.modal-box-run .run-body { margin: 6px 0 20px; }
+.modal-box-run .run-log {
+  height: min(46vh, 380px);
+  overflow-y: auto;
+  background: #0b1220;
+  border: 1px solid var(--color-zinc-200);
+  border-radius: 10px;
+  padding: 16px 18px;
+  font-family: "JetBrains Mono", "Consolas", "Menlo", monospace;
+  font-size: 13px;
+  line-height: 1.9;
+  text-align: left;
+}
+.modal-box-run .run-log-line { display: block; white-space: pre-wrap; word-break: break-word; color: #cbd5e1; }
+.modal-box-run .run-log-cursor {
+  display: inline-block; width: 8px; height: 15px; margin-left: 2px;
+  vertical-align: text-bottom; background: #60a5fa;
+  animation: runCursorBlink 0.9s steps(2, start) infinite;
+}
+@keyframes runCursorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.modal-box-run .run-log-step { color: #e2e8f0; font-weight: 600; }
+.modal-box-run .run-log-ok { color: #4ade80; }
+.modal-box-run .run-log-red { color: #f87171; }
+.modal-box-run .run-log-info { color: #94a3b8; }
+.modal-btn[disabled] { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+

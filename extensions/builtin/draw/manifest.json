@@ -1,0 +1,16 @@
+{
+  "id": "draw",
+  "name": "绘图",
+  "version": "1.0.0",
+  "author": "一站式数模工坊",
+  "description": "AntV X6 流程图编辑器，支持拖拽建模、主题切换、PNG/SVG 导出",
+  "main": "main.js",
+  "type": "builtin",
+  "permissions": ["fs", "workspace"],
+  "slot": "workshop",
+  "button": {
+    "label": "绘图",
+    "order": 2,
+    "icon": "<path d=\"M12 19l7-7 3 3-7 7-3-3z\"/><path d=\"M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z\"/><circle cx=\"11\" cy=\"11\" r=\"2\"/>"
+  }
+}

@@ -1,0 +1,4 @@
+dist/
+.codegraph/
+AGENTS.md
+node_modules/
